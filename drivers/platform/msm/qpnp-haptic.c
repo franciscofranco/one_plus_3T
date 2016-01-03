@@ -1700,6 +1700,12 @@ static void qpnp_timed_enable_worker(struct work_struct *work)
 		}
 		hap->state = 0;
 	} else {
+
+		if (hap->vmax_mv == QPNP_HAP_VMAX_MIN_MV) {
+			mutex_unlock(&hap->lock);
+			return;
+		}
+
 		value = (value > hap->timeout_ms ?
 				 hap->timeout_ms : value);
 		hap->state = 1;
