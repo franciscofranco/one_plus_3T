@@ -81,3 +81,5 @@ config WLAN_FEATURE_RX_WAKELOCK
 	help
 	Enable WLAN_FEATURE_HOLD_RX_WAKELOCK which is required to take rx
 	wakelock when driver receives packets from fw.
+
+source "drivers/net/wireless/cnss/logger/Kconfig"
