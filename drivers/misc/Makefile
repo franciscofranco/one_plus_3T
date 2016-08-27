@@ -73,3 +73,4 @@ obj-$(CONFIG_PTN5150_TYPE_C)	+= type-c-ptn5150.o
 obj-y  += type-c_notifier.o
 obj-$(CONFIG_GPIO_SWITCH)	+= gpio_switch.o
 obj-$(CONFIG_BOOTLOADER_LOG)	+= bootloader_log.o
+obj-$(CONFIG_FORCE_FAST_CHARGE) += fastchg.o
