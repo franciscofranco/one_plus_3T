@@ -249,10 +249,10 @@ void trigger_cpu_pwr_stats_calc(void)
 		if (cpu_node->sensor_id < 0)
 			continue;
 
-		if (cpu_node->temp == prev_temp[cpu])
+		if (cpu_node->temp == prev_temp[cpu]) {
 			sensor_get_temp(cpu_node->sensor_id, &temp);
-
-		cpu_node->temp = temp / scaling_factor;
+			cpu_node->temp = temp / scaling_factor;
+		}
 
 		prev_temp[cpu] = cpu_node->temp;
 
@@ -386,7 +386,7 @@ static int update_userspace_power(struct sched_params __user *argp)
 {
 	int i;
 	int ret;
-	int cpu;
+	int cpu = -1;
 	struct cpu_activity_info *node;
 	struct cpu_static_info *sp, *clear_sp;
 	int cpumask, cluster, mpidr;
@@ -409,7 +409,7 @@ static int update_userspace_power(struct sched_params __user *argp)
 		}
 	}
 
-	if (cpu >= num_possible_cpus())
+	if ((cpu < 0) || (cpu >= num_possible_cpus()))
 		return -EINVAL;
 
 	node = &activity[cpu];
