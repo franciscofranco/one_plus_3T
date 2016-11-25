@@ -854,6 +854,7 @@ remapping backlight 230-->255 to 200-->255
 **********************************************/
 static u32 backlight_remap(u32 level)
 {
+#ifdef BACKLIGHT_REMAP
     u32 temp = 0;
 #if 0
     temp = (level > max_brightness_setting)? max_brightness_setting: level;
@@ -867,6 +868,9 @@ static u32 backlight_remap(u32 level)
 	}
 #endif
 	return temp;
+#else
+	return level;
+#endif
 }
 
 /*********************************************************************************
