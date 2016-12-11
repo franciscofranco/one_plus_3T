@@ -106,6 +106,8 @@
 	qcom,gpu-quirk-critical-packets;
 	qcom,gpu-quirk-fault-detect-mask;
 
+	qcom,l2pc-cpu-mask = <0x0000000C>;
+
 	qcom,gpu-pwrlevel-bins {
 		#address-cells = <1>;
 		#size-cells = <0>;
