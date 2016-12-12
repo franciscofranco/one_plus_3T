@@ -925,8 +925,7 @@ typedef struct
 #ifdef WLAN_FEATURE_11AC
 typedef struct
 {
-   tANI_U16  opMode;
-   tANI_U16  chanMode;
+   tANI_U16   opMode;
    tANI_U16  staId;
    tANI_U16  smesessionId;
    tSirMacAddr peer_mac;

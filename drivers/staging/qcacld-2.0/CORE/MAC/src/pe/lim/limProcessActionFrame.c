@@ -613,7 +613,7 @@ __limProcessOperatingModeActionFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo
             ch_bw = eHT_CHANNEL_WIDTH_20MHZ;
         }
         limCheckVHTOpModeChange(pMac, psessionEntry,
-                                 ch_bw, MODE_MAX,
+                                 ch_bw,
                                  pSta->staIndex, pHdr->sa);
     }
 
