@@ -98,3 +98,4 @@ x509.genkey
 all.config
 
 build.sh
+upload.sh
