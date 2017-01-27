@@ -568,15 +568,7 @@ static struct cpufreq_driver msm_cpufreq_driver = {
 #define UNDERCLK_MAX_PWRCL_MSM8996PRO	1516800
 #define UNDERCLK_MAX_PERFCL_MSM8996	1824000
 #define UNDERCLK_MAX_PWRCL_MSM8996	1478400
-static bool no_cpu_underclock;
-
-static int __init get_cpu_underclock(char *unused)
-{
-	no_cpu_underclock = true;
-
-	return 0;
-}
-__setup("no_underclock", get_cpu_underclock);
+static bool no_cpu_underclock = true;
 #endif
 
 static struct cpufreq_frequency_table *cpufreq_parse_dt(struct device *dev,
