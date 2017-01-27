@@ -17,6 +17,10 @@
  *
  */
 
+#ifndef CONFIG_MACH_MSM8996_15801
+#define CONFIG_MACH_MSM8996_15801
+#endif
+
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/cpufreq.h>
