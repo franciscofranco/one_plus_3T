@@ -3812,6 +3812,13 @@ qcom,msm-mi2s-ext-mclk = <0>;
 		linux,contiguous-region = <&bootloader_log_mem>;
         };
 
+	qcom,bcl {
+		/delete-property/ qcom,bcl-hotplug-list;
+		/delete-property/ qcom,bcl-soc-hotplug-list;
+		qcom,ibat-monitor {
+			qcom,mitigation-freq-khz = <1132800>;
+		};
+	};
 };
 
 &gdsc_venus {
