@@ -448,8 +448,14 @@ static void fpc1020_suspend_resume(struct work_struct *work)
 	/* Escalate fingerprintd priority when screen is off */
 	if (fpc1020->screen_state)
 		set_fingerprintd_nice(0);
-	else
-		set_fingerprintd_nice(MIN_NICE);
+	else {
+		/*
+                 * Elevate fingerprintd priority when screen is off to ensure
+                 * the fingerprint sensor is responsive and that the haptic
+                 * response on successful verification always fires.
+                 */
+		set_fingerprintd_nice(-1);
+	}
 
 	sysfs_notify(&fpc1020->dev->kobj, NULL,
 				dev_attr_screen_state.attr.name);
