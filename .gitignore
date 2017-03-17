@@ -98,3 +98,7 @@ x509.genkey
 all.config
 
 build.sh
+build_op3.sh
+build_op3t.sh
+upload_op3.sh
+upload_op3t.sh
