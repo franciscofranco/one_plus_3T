@@ -17,13 +17,16 @@
 #include <linux/seq_file.h>
 #include <linux/pm_qos.h>
 #include <linux/cpufreq.h>
+#include <soc/qcom/socinfo.h>
 
 #include "power.h"
 
 DEFINE_MUTEX(pm_mutex);
 
-#define RESUME_BOOST_LITTLE_CPU_QOS_FREQ 1593600
-#define RESUME_BOOST_BIG_CPU_QOS_FREQ    2073600
+#define RESUME_MAX_PERFCL_MSM8996PRO  2150400
+#define RESUME_MAX_PWRCL_MSM8996PRO   1516800
+#define RESUME_MAX_PERFCL_MSM8996     1824000
+#define RESUME_MAX_PWRCL_MSM8996      1478400
 
 static struct pm_qos_request resumeboost_little_cpu_qos;
 static struct pm_qos_request resumeboost_big_cpu_qos;
@@ -397,24 +400,32 @@ void resumeboost_fn(void)
 {
         struct cpufreq_policy *policy;
 
-	if(get_resume_wakeup_flag() || get_qpnp_kpdpwr_resume_wakeup_flag()) {
-		/* Fetch little cpu policy and drive the CPU towards target frequency */
+	if (get_resume_wakeup_flag() || get_qpnp_kpdpwr_resume_wakeup_flag()) {
+		// for the SD820
+		unsigned int silver = RESUME_MAX_PWRCL_MSM8996;
+		unsigned int gold = RESUME_MAX_PERFCL_MSM8996;
+
+		// for the SD821
+		if (socinfo_get_id() == 305) {
+			silver = RESUME_MAX_PWRCL_MSM8996PRO;
+			gold = RESUME_MAX_PERFCL_MSM8996PRO;
+		}
+
+		/* Fetch little cpu policy and drive the CPU towards max frequency */
                 policy = cpufreq_cpu_get(0);
                 if (policy)  {
-                        cpufreq_driver_target(policy, RESUME_BOOST_LITTLE_CPU_QOS_FREQ, CPUFREQ_RELATION_H);
-                        pm_qos_update_request_timeout(&resumeboost_little_cpu_qos, RESUME_BOOST_LITTLE_CPU_QOS_FREQ, 1000000);
-                } else
-			return;
-                cpufreq_cpu_put(policy);
+                        cpufreq_driver_target(policy, silver, CPUFREQ_RELATION_H);
+                        pm_qos_update_request_timeout(&resumeboost_little_cpu_qos, silver, 1000000);
+			cpufreq_cpu_put(policy);
+		}
 
-		/* Fetch big cpu policy and drive big cpu towards target frequency */
+		/* Fetch big cpu policy and drive big cpu towards max frequency */
 		policy = cpufreq_cpu_get(2);
 		if (policy)  {
-			cpufreq_driver_target(policy, RESUME_BOOST_BIG_CPU_QOS_FREQ, CPUFREQ_RELATION_H);
-			pm_qos_update_request_timeout(&resumeboost_big_cpu_qos, RESUME_BOOST_BIG_CPU_QOS_FREQ, 1000000);
-		} else
-			return;
-		cpufreq_cpu_put(policy);
+			cpufreq_driver_target(policy, gold, CPUFREQ_RELATION_H);
+			pm_qos_update_request_timeout(&resumeboost_big_cpu_qos, gold, 1000000);
+			cpufreq_cpu_put(policy);
+		}
 	}
 }
 
