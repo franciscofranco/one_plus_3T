@@ -88,11 +88,6 @@ static int qpnp_write_wrapper(struct qpnp_rtc *rtc_dd, u8 *rtc_val,
 	int rc;
 	struct spmi_device *spmi = rtc_dd->spmi;
 
-    if (base == (rtc_dd->alarm_base + REG_OFFSET_ALARM_CTRL1)) {
-	    dev_err(rtc_dd->rtc_dev, "write ALARM_CTRL1=0x%x\n", *rtc_val);
-	    if (!(*rtc_val & BIT_RTC_ALARM_ENABLE))
-	        dump_stack();
-    }
 	rc = spmi_ext_register_writel(spmi->ctrl, spmi->sid, base, rtc_val,
 					count);
 	if (rc) {
