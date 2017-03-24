@@ -1047,19 +1047,6 @@ static int __send_signal(int sig, struct siginfo *info, struct task_struct *t,
 
 	result = TRACE_SIGNAL_IGNORED;
 
-	if(print_key_process_murder) {
-		if(!strcmp(t->comm, "system_server") ||
-			is_zygote_process(t) ||
-			!strcmp(t->comm, "surfaceflinger") ||
-			!strcmp(t->comm, "servicemanager"))
-		{
-			struct task_struct *tg = current->group_leader;
-			printk("process %d:%s, %d:%s send sig:%d to process %d:%s\n",
-					tg->pid, tg->comm, current->pid, current->comm, sig, t->pid, t->comm);
-		}
-	}
-
-	
 	if (!prepare_signal(sig, t,
 			from_ancestor_ns || (info == SEND_SIG_FORCED)))
 		goto ret;
