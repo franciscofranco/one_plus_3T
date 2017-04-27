@@ -957,7 +957,7 @@ int cfg80211_connect(struct cfg80211_registered_device *rdev,
 
 	ASSERT_WDEV_LOCK(wdev);
 
-	if (WARN_ON(wdev->connect_keys)) {
+	if (wdev->connect_keys) {
 		kzfree(wdev->connect_keys);
 		wdev->connect_keys = NULL;
 	}
