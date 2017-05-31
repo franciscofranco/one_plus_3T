@@ -88,6 +88,10 @@ static int qpnp_write_wrapper(struct qpnp_rtc *rtc_dd, u8 *rtc_val,
 	int rc;
 	struct spmi_device *spmi = rtc_dd->spmi;
 
+	if (base == (rtc_dd->alarm_base + REG_OFFSET_ALARM_CTRL1)) {
+		dev_err(rtc_dd->rtc_dev, "write ALARM_CTRL1=0x%x\n", *rtc_val);
+	}
+
 	rc = spmi_ext_register_writel(spmi->ctrl, spmi->sid, base, rtc_val,
 					count);
 	if (rc) {
@@ -394,7 +398,7 @@ qpnp_rtc_alarm_irq_enable(struct device *dev, unsigned int enabled)
 	ctrl_reg = rtc_dd->alarm_ctrl_reg1;
 	ctrl_reg = enabled ? (ctrl_reg | BIT_RTC_ALARM_ENABLE) :
 				(ctrl_reg & ~BIT_RTC_ALARM_ENABLE);
-
+    dev_err(rtc_dd->rtc_dev, "%s,%d write ALARM_CTRL1=0x%x\n",__func__,__LINE__,ctrl_reg);
 	rc = qpnp_write_wrapper(rtc_dd, &ctrl_reg,
 			rtc_dd->alarm_base + REG_OFFSET_ALARM_CTRL1, 1);
 	if (rc) {
@@ -668,6 +672,7 @@ static void qpnp_rtc_shutdown(struct spmi_device *spmi)
 		/* Disable RTC alarms */
 		reg = rtc_dd->alarm_ctrl_reg1;
 		reg &= ~BIT_RTC_ALARM_ENABLE;
+		dev_err(rtc_dd->rtc_dev, "%s,%d write ALARM_CTRL1=0x%x\n",__func__,__LINE__,reg);
 		rc = qpnp_write_wrapper(rtc_dd, &reg,
 			rtc_dd->alarm_base + REG_OFFSET_ALARM_CTRL1, 1);
 		if (rc) {
