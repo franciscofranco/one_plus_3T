@@ -839,7 +839,6 @@ static int __from_user_pcc_coeff_v17(
 	struct mdp_pcc_data_v1_7_32 pcc_cfg_payload32;
 	struct mdp_pcc_data_v1_7 pcc_cfg_payload;
 
-	memset(&pcc_cfg_payload32, 0, sizeof(pcc_cfg_payload32));
 	if (copy_from_user(&pcc_cfg_payload32,
 			   compat_ptr(pcc_cfg32->cfg_payload),
 			   sizeof(struct mdp_pcc_data_v1_7_32))) {
@@ -2958,7 +2957,7 @@ static int mdss_compat_pp_ioctl(struct fb_info *info, unsigned int cmd,
 	uint32_t op;
 	int ret = 0;
 	struct msmfb_mdp_pp32 __user *pp32;
-	struct msmfb_mdp_pp __user *pp;
+	struct msmfb_mdp_pp __user *pp = NULL;
 
 	pp32 = compat_ptr(arg);
 	if (copy_from_user(&op, &pp32->op, sizeof(uint32_t)))
