@@ -44,6 +44,7 @@
 	status = "ok";
 };
 
+#if 0
 &uartblsp2dm1 {
 	status = "ok";
 	pinctrl-names = "default";
@@ -92,6 +93,7 @@
 
 	status = "ok";
 };
+#endif
 
 &pm8994_vadc {
 	chan@5 {
