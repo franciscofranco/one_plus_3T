@@ -3485,7 +3485,7 @@ int mdss_fb_atomic_commit(struct fb_info *info,
 				output_layer = commit_v1->output_layer;
 				if (!output_layer) {
 					pr_err("Output layer is null\n");
-					return ret;
+					goto end;
 				}
 				wb_change = !mdss_fb_is_wb_config_same(mfd,
 						commit_v1->output_layer);
