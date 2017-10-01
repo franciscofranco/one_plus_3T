@@ -1217,6 +1217,8 @@ err_misc_register_failed:
 err_read_dt:
 	kfree(di);
 err_check_functionality_failed:
+	wake_lock_destroy(&di->fastchg_wake_lock);
+	wake_lock_destroy(&di->fastchg_update_fireware_lock);
 	pr_err("dash_probe fail\n");
 	return 0;
 }
@@ -1235,6 +1237,9 @@ static int dash_remove(struct i2c_client *client)
 	if (gpio_is_valid(di->ap_data))
 		gpio_free(di->ap_data);
 	pm_qos_remove_request(&big_cpu_update_freq);
+
+	wake_lock_destroy(&di->fastchg_wake_lock);
+        wake_lock_destroy(&di->fastchg_update_fireware_lock);
 
 	return 0;
 }
