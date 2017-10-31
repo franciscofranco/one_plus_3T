@@ -1797,6 +1797,7 @@ struct task_struct {
 	int etask_claim;
 	int claim_cpu;
 	bool utask_slave;
+	atomic64_t *concurrent_active_time;
 };
 
 /* Future-safe accessor for struct task_struct's cpus_allowed. */
