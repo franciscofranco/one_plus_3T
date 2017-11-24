@@ -103,3 +103,4 @@ build_op3t.sh
 upload_op3.sh
 upload_op3t.sh
 
+drivers/platform/msm/ipa/ipa_common
