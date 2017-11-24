@@ -1812,7 +1812,7 @@ static enum hrtimer_restart qpnp_hap_timer(struct hrtimer *timer)
 		return HRTIMER_NORESTART;
 
 	hap->state = 0;
-	queue_work(vibqueue,&hap->work);
+	schedule_work(&hap->work);
 
 	return HRTIMER_NORESTART;
 }
