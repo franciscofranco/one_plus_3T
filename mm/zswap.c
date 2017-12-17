@@ -816,10 +816,6 @@ static void zswap_frontswap_invalidate_area(unsigned type)
 	zswap_trees[type] = NULL;
 }
 
-static const struct zpool_ops zswap_zpool_ops = {
-	.evict = zswap_writeback_entry
-};
-
 static void zswap_frontswap_init(unsigned type)
 {
 	struct zswap_tree *tree;
