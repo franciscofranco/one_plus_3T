@@ -334,6 +334,7 @@ static void __kthread_bind(struct task_struct *p, unsigned int cpu, long state)
 	}
 	/* It's safe because the task is inactive. */
 	do_set_cpus_allowed(p, cpumask_of(cpu));
+	p->kthread_per_cpu = true;
 	p->flags |= PF_NO_SETAFFINITY;
 }
 
