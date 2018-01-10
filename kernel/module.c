@@ -2714,8 +2714,7 @@ static int check_modinfo(struct module *mod, struct load_info *info, int flags)
 	} else if (!same_magic(modmagic, vermagic, info->index.vers)) {
 		pr_err("%s: version magic '%s' should be '%s'\n",
 		       mod->name, modmagic, vermagic);
-		if (strncmp("wlan", mod->name, 4))
-			return -ENOEXEC;
+		return -ENOEXEC;
 	}
 
 	if (!get_modinfo(info, "intree"))
