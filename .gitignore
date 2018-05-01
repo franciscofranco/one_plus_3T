@@ -96,3 +96,11 @@ x509.genkey
 
 # Kconfig presets
 all.config
+build_op3.sh
+build_op3t.sh
+net/wireguard/
+out/
+upload_op3.sh
+upload_op3t.sh
+version
+drivers/platform/msm/ipa/ipa_common
