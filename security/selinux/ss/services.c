@@ -860,6 +860,9 @@ int security_bounded_transition(u32 old_sid, u32 new_sid)
 	int index;
 	int rc;
 
+	if (!ss_initialized)
+		return 0;
+
 	read_lock(&policy_rwlock);
 
 	rc = -EINVAL;
@@ -1409,39 +1412,31 @@ static int security_context_to_sid_core(const char *scontext, u32 scontext_len,
 	if (!scontext_len)
 		return -EINVAL;
 
+	/* Copy the string to allow changes and ensure a NUL terminator */
+	scontext2 = kmemdup_nul(scontext, scontext_len, gfp_flags);
+	if (!scontext2)
+		return -ENOMEM;
+
 	if (!ss_initialized) {
 		int i;
 
 		for (i = 1; i < SECINITSID_NUM; i++) {
-			if (!strcmp(initial_sid_to_string[i], scontext)) {
+			if (!strcmp(initial_sid_to_string[i], scontext2)) {
 				*sid = i;
-				return 0;
+				goto out;
 			}
 		}
 		*sid = SECINITSID_KERNEL;
-		return 0;
+		goto out;
 	}
 	*sid = SECSID_NULL;
-
-	/* Copy the string so that we can modify the copy as we parse it. */
-	scontext2 = kmalloc(scontext_len + 1, gfp_flags);
-	if (!scontext2){
-	    printk(KERN_ERR "%s: kmalloc failed for \'%s\' with len: %u\n",
-	            __func__, scontext, scontext_len);
-		return -ENOMEM;
-	}
-	memcpy(scontext2, scontext, scontext_len);
-	scontext2[scontext_len] = 0;
 
 	if (force) {
 		/* Save another copy for storing in uninterpreted form */
 		rc = -ENOMEM;
 		str = kstrdup(scontext2, gfp_flags);
-		if (!str){
-		    printk(KERN_ERR "%s: kstrdup failed for \'%s\' with len: %u\n",
-	                __func__, scontext2, scontext_len);
+		if (!str)
 			goto out;
-		}
 	}
 
 	read_lock(&policy_rwlock);
@@ -1449,7 +1444,7 @@ static int security_context_to_sid_core(const char *scontext, u32 scontext_len,
 				      scontext_len, &context, def_sid);
 	if (rc == -EINVAL && force) {
 		context.str = str;
-		context.len = scontext_len;
+		context.len = strlen(str) + 1;
 		str = NULL;
 	} else if (rc)
 		goto out_unlock;
@@ -2032,7 +2027,6 @@ int security_load_policy(void *data, size_t len)
 	}
 	newpolicydb = oldpolicydb + 1;
 
-	printk(KERN_ERR "SELinux: security_load_policy, ss_initialized: %d\n",ss_initialized);
 	if (!ss_initialized) {
 		avtab_cache_init();
 		rc = policydb_read(&policydb, fp);
@@ -2106,10 +2100,8 @@ int security_load_policy(void *data, size_t len)
 	sidtab_shutdown(&sidtab);
 
 	rc = sidtab_map(&sidtab, clone_sid, &newsidtab);
-	if (rc){
-	    printk(KERN_ERR "SELinux: sidtab_map failed: %d\n", rc);
+	if (rc)
 		goto err;
-	}
 
 	/*
 	 * Convert the internal representations of contexts
@@ -2161,8 +2153,6 @@ err:
 
 out:
 	kfree(oldpolicydb);
-	printk(KERN_ERR "SELinux: security_load_policy, sidtab.shutdown: %d\n",
-	    sidtab.shutdown);
 	return rc;
 }
 
