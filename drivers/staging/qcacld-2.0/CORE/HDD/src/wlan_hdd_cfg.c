@@ -4804,6 +4804,63 @@ REG_TABLE_ENTRY g_registry_table[] =
                 CFG_RX_AGGREGATION_SIZE_DEFAULT,
                 CFG_RX_AGGREGATION_SIZE_MIN,
                 CFG_RX_AGGREGATION_SIZE_MAX),
+
+   REG_VARIABLE(CFG_TX_AGGR_SW_RETRY_BE, WLAN_PARAM_Integer,
+                hdd_config_t, tx_aggr_sw_retry_threshhold_be,
+                VAR_FLAGS_OPTIONAL | VAR_FLAGS_RANGE_CHECK_ASSUME_DEFAULT,
+                CFG_TX_AGGR_SW_RETRY_BE_DEFAULT,
+                CFG_TX_AGGR_SW_RETRY_BE_MIN,
+                CFG_TX_AGGR_SW_RETRY_BE_MAX),
+
+   REG_VARIABLE(CFG_TX_AGGR_SW_RETRY_BK, WLAN_PARAM_Integer,
+                hdd_config_t, tx_aggr_sw_retry_threshhold_bk,
+                VAR_FLAGS_OPTIONAL | VAR_FLAGS_RANGE_CHECK_ASSUME_DEFAULT,
+                CFG_TX_AGGR_SW_RETRY_BK_DEFAULT,
+                CFG_TX_AGGR_SW_RETRY_BK_MIN,
+                CFG_TX_AGGR_SW_RETRY_BK_MAX),
+
+   REG_VARIABLE(CFG_TX_AGGR_SW_RETRY_VI, WLAN_PARAM_Integer,
+                hdd_config_t, tx_aggr_sw_retry_threshhold_vi,
+                VAR_FLAGS_OPTIONAL | VAR_FLAGS_RANGE_CHECK_ASSUME_DEFAULT,
+                CFG_TX_AGGR_SW_RETRY_VI_DEFAULT,
+                CFG_TX_AGGR_SW_RETRY_VI_MIN,
+                CFG_TX_AGGR_SW_RETRY_VI_MAX),
+
+   REG_VARIABLE(CFG_TX_AGGR_SW_RETRY_VO, WLAN_PARAM_Integer,
+                hdd_config_t, tx_aggr_sw_retry_threshhold_vo,
+                VAR_FLAGS_OPTIONAL | VAR_FLAGS_RANGE_CHECK_ASSUME_DEFAULT,
+                CFG_TX_AGGR_SW_RETRY_VO_DEFAULT,
+                CFG_TX_AGGR_SW_RETRY_VO_MIN,
+                CFG_TX_AGGR_SW_RETRY_VO_MAX),
+
+   REG_VARIABLE(CFG_TX_NON_AGGR_SW_RETRY_BE, WLAN_PARAM_Integer,
+                hdd_config_t, tx_non_aggr_sw_retry_threshhold_be,
+                VAR_FLAGS_OPTIONAL | VAR_FLAGS_RANGE_CHECK_ASSUME_DEFAULT,
+                CFG_TX_NON_AGGR_SW_RETRY_BE_DEFAULT,
+                CFG_TX_NON_AGGR_SW_RETRY_BE_MIN,
+                CFG_TX_NON_AGGR_SW_RETRY_BE_MAX),
+
+   REG_VARIABLE(CFG_TX_NON_AGGR_SW_RETRY_BK, WLAN_PARAM_Integer,
+                hdd_config_t, tx_non_aggr_sw_retry_threshhold_bk,
+                VAR_FLAGS_OPTIONAL | VAR_FLAGS_RANGE_CHECK_ASSUME_DEFAULT,
+                CFG_TX_NON_AGGR_SW_RETRY_BK_DEFAULT,
+                CFG_TX_NON_AGGR_SW_RETRY_BK_MIN,
+                CFG_TX_NON_AGGR_SW_RETRY_BK_MAX),
+
+   REG_VARIABLE(CFG_TX_NON_AGGR_SW_RETRY_VI, WLAN_PARAM_Integer,
+                hdd_config_t, tx_non_aggr_sw_retry_threshhold_vi,
+                VAR_FLAGS_OPTIONAL | VAR_FLAGS_RANGE_CHECK_ASSUME_DEFAULT,
+                CFG_TX_NON_AGGR_SW_RETRY_VI_DEFAULT,
+                CFG_TX_NON_AGGR_SW_RETRY_VI_MIN,
+                CFG_TX_NON_AGGR_SW_RETRY_VI_MAX),
+
+   REG_VARIABLE(CFG_TX_NON_AGGR_SW_RETRY_VO, WLAN_PARAM_Integer,
+                hdd_config_t, tx_non_aggr_sw_retry_threshhold_vo,
+                VAR_FLAGS_OPTIONAL | VAR_FLAGS_RANGE_CHECK_ASSUME_DEFAULT,
+                CFG_TX_NON_AGGR_SW_RETRY_VO_DEFAULT,
+                CFG_TX_NON_AGGR_SW_RETRY_VO_MIN,
+                CFG_TX_NON_AGGR_SW_RETRY_VO_MAX),
+
    REG_VARIABLE(CFG_CREATE_BUG_REPORT_FOR_SCAN, WLAN_PARAM_Integer,
                 hdd_config_t, bug_report_for_scan_results,
                 VAR_FLAGS_OPTIONAL | VAR_FLAGS_RANGE_CHECK_ASSUME_DEFAULT,
@@ -5493,13 +5550,14 @@ VOS_STATUS hdd_parse_config_ini(hdd_context_t* pHddCtx)
    hddLog(LOG1, "%s: qcom_cfg.ini Size %zu", __func__, fw->size);
 
    buffer = (char*)vos_mem_malloc(fw->size + 1);
-   buffer[fw->size] = '\0';
 
    if(NULL == buffer) {
       hddLog(VOS_TRACE_LEVEL_FATAL, "%s: kmalloc failure",__func__);
       release_firmware(fw);
       return VOS_STATUS_E_FAILURE;
    }
+
+   buffer[fw->size] = '\0';
    pTemp = buffer;
 
    vos_mem_copy((void*)buffer,(void *)fw->data, fw->size);
@@ -6400,6 +6458,12 @@ static void update_mac_from_string(hdd_context_t *pHddCtx, tCfgIniEntry *macTabl
             break;
       }
       if (res == 0 && !vos_is_macaddr_zero(&macaddr[i])) {
+         hddLog(VOS_TRACE_LEVEL_INFO,
+                "wlan_mac.bin update mac addr[%d] from " MAC_ADDRESS_STR
+                " to " MAC_ADDRESS_STR,
+                i,
+                MAC_ADDR_ARRAY(pHddCtx->cfg_ini->intfMacAddr[i].bytes),
+                MAC_ADDR_ARRAY(macaddr[i].bytes));
          vos_mem_copy((v_U8_t *)&pHddCtx->cfg_ini->intfMacAddr[i].bytes[0],
                       (v_U8_t *)&macaddr[i].bytes[0], VOS_MAC_ADDR_SIZE);
       }
@@ -8275,6 +8339,22 @@ VOS_STATUS hdd_set_sme_config( hdd_context_t *pHddCtx )
                    pHddCtx->cfg_ini->tx_aggregation_size;
    smeConfig->csrConfig.rx_aggregation_size =
                    pHddCtx->cfg_ini->rx_aggregation_size;
+   smeConfig->csrConfig.tx_aggr_sw_retry_threshhold_be =
+                   pHddCtx->cfg_ini->tx_aggr_sw_retry_threshhold_be;
+   smeConfig->csrConfig.tx_aggr_sw_retry_threshhold_bk =
+                   pHddCtx->cfg_ini->tx_aggr_sw_retry_threshhold_bk;
+   smeConfig->csrConfig.tx_aggr_sw_retry_threshhold_vi =
+                   pHddCtx->cfg_ini->tx_aggr_sw_retry_threshhold_vi;
+   smeConfig->csrConfig.tx_aggr_sw_retry_threshhold_vo =
+                   pHddCtx->cfg_ini->tx_aggr_sw_retry_threshhold_vo;
+   smeConfig->csrConfig.tx_non_aggr_sw_retry_threshhold_be =
+                   pHddCtx->cfg_ini->tx_non_aggr_sw_retry_threshhold_be;
+   smeConfig->csrConfig.tx_non_aggr_sw_retry_threshhold_bk =
+                   pHddCtx->cfg_ini->tx_non_aggr_sw_retry_threshhold_bk;
+   smeConfig->csrConfig.tx_non_aggr_sw_retry_threshhold_vi =
+                   pHddCtx->cfg_ini->tx_non_aggr_sw_retry_threshhold_vi;
+   smeConfig->csrConfig.tx_non_aggr_sw_retry_threshhold_vo =
+                   pHddCtx->cfg_ini->tx_non_aggr_sw_retry_threshhold_vo;
 
    smeConfig->csrConfig.enable_edca_params =
                         pHddCtx->cfg_ini->enable_edca_params;

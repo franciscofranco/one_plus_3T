@@ -343,26 +343,11 @@ struct linkspeedContext
    unsigned int magic;
 };
 
-/**
- * struct random_mac_context - Context used with hdd_random_mac_callback
- * @random_mac_completion: Event on which hdd_set_random_mac will wait
- * @adapter: Pointer to adapter
- * @magic: For valid context this is set to ACTION_FRAME_RANDOM_CONTEXT_MAGIC
- * @set_random_addr: Status of random filter set
- */
-struct random_mac_context {
-	struct completion random_mac_completion;
-	hdd_adapter_t *adapter;
-	unsigned int magic;
-	bool set_random_addr;
-};
-
 extern spinlock_t hdd_context_lock;
 
 #define STATS_CONTEXT_MAGIC 0x53544154   //STAT
 #define PEER_INFO_CONTEXT_MAGIC  0x52535349   /* PEER_INFO */
 #define POWER_CONTEXT_MAGIC 0x504F5752   //POWR
-#define SNR_CONTEXT_MAGIC   0x534E5200   //SNR
 #define LINK_CONTEXT_MAGIC  0x4C494E4B   //LINKSPEED
 #define LINK_STATUS_MAGIC   0x4C4B5354   //LINKSTATUS(LNST)
 #define TEMP_CONTEXT_MAGIC 0x74656d70   // TEMP (temperature)
@@ -1433,8 +1418,6 @@ struct hdd_adapter_s
 
     /* State for synchronous OCB requests to WMI */
     struct sir_ocb_set_config_response ocb_set_config_resp;
-    struct sir_ocb_get_tsf_timer_response ocb_get_tsf_timer_resp;
-    struct sir_dcc_get_stats_response *dcc_get_stats_resp;
     struct sir_dcc_update_ndl_response dcc_update_ndl_resp;
     struct dsrc_radio_chan_stats_ctxt dsrc_chan_stats;
 #ifdef WLAN_FEATURE_DSRC
@@ -1458,7 +1441,6 @@ struct hdd_adapter_s
     struct hdd_netif_queue_history
             queue_oper_history[WLAN_HDD_MAX_HISTORY_ENTRY];
     struct hdd_netif_queue_stats queue_oper_stats[WLAN_REASON_TYPE_MAX];
-    struct power_stats_response *chip_power_stats;
 
     /* random address management for management action frames */
     spinlock_t random_mac_lock;
@@ -1953,11 +1935,6 @@ struct hdd_context_s
 
     /* debugfs entry */
     struct dentry *debugfs_phy;
-
-#ifdef WLAN_POWER_DEBUGFS
-    /* mutex lock to block concurrent access */
-    struct mutex power_stats_lock;
-#endif
 
     /* Use below lock to protect access to isSchedScanUpdatePending
      * since it will be accessed in two different contexts.
