@@ -754,15 +754,6 @@ adreno_ringbuffer_issueibcmds(struct kgsl_device_private *dev_priv,
 	/* wait for the suspend gate */
 	wait_for_completion(&device->cmdbatch_gate);
 
-	/*
-	 * Clear the wake on touch bit to indicate an IB has been
-	 * submitted since the last time we set it. But only clear
-	 * it when we have rendering commands.
-	 */
-	if (!(cmdbatch->flags & KGSL_CMDBATCH_MARKER)
-		&& !(cmdbatch->flags & KGSL_CMDBATCH_SYNC))
-		device->flags &= ~KGSL_FLAG_WAKE_ON_TOUCH;
-
 	/* A3XX does not have support for command batch profiling */
 	if (adreno_is_a3xx(adreno_dev) &&
 			(cmdbatch->flags & KGSL_CMDBATCH_PROFILING))
