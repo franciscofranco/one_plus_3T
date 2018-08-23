@@ -463,6 +463,9 @@ static struct key *construct_key_and_link(struct keyring_search_context *ctx,
 
 	kenter("");
 
+	if (ctx->index_key.type == &key_type_keyring)
+		return ERR_PTR(-EPERM);
+
 	ret = construct_get_dest_keyring(&dest_keyring);
 	if (ret)
 		goto error;
