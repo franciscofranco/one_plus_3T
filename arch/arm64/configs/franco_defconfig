@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 3.18.119 Kernel Configuration
+# Linux/arm64 3.18.122 Kernel Configuration
 #
 CONFIG_ARM64=y
 CONFIG_64BIT=y
@@ -626,6 +626,7 @@ CONFIG_TCP_CONG_VENO=y
 CONFIG_TCP_CONG_YEAH=y
 CONFIG_TCP_CONG_ILLINOIS=y
 CONFIG_TCP_CONG_DCTCP=y
+# CONFIG_DEFAULT_BIC is not set
 CONFIG_DEFAULT_CUBIC=y
 # CONFIG_DEFAULT_HTCP is not set
 # CONFIG_DEFAULT_HYBLA is not set
