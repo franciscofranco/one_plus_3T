@@ -399,7 +399,7 @@ static int cpe_worker_thread(void *context)
 	 */
 	while (1) {
 		/* Wait for command to be processed */
-		wait_for_completion(&t_info->cmd_complete);
+		wait_for_completion_interruptible(&t_info->cmd_complete);
 
 		CPE_SVC_GRAB_LOCK(&t_info->msg_lock, "msg_lock");
 		cpe_cmd_received(t_info);
