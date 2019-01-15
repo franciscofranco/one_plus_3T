@@ -15,7 +15,7 @@
 
 #include "zcomp_lzo.h"
 
-static void *lzo_create(void)
+static void *lzo_create(gfp_t flags)
 {
 	void *ret;
 
