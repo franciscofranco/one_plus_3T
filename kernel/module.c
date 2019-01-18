@@ -826,6 +826,13 @@ SYSCALL_DEFINE2(delete_module, const char __user *, name_user,
 		goto out;
 	}
 
+	if (!strncmp(name, "wlan", 4)) {
+		pr_debug("I see you trying to unload wlan.ko but it ain't "
+			"gonna happen -> fuck you userspace\n");
+		ret = -EBUSY;
+		goto out;
+	}
+
 	if (!list_empty(&mod->source_list)) {
 		/* Other modules depend on us: get rid of them first. */
 		ret = -EWOULDBLOCK;
