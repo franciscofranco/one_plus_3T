@@ -1128,7 +1128,7 @@ static int dash_pinctrl_init(struct fastchg_device_info *di)
 
 static int dash_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
-	struct fastchg_device_info *di;
+	struct fastchg_device_info *di = NULL;
 	int ret;
 
 	pr_info("dash_probe\n");
