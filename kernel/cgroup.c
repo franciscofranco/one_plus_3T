@@ -57,6 +57,7 @@
 #include <linux/vmalloc.h> /* TODO: replace with more sophisticated array */
 #include <linux/kthread.h>
 #include <linux/delay.h>
+#include <linux/binfmts.h>
 #include <linux/cpu_input_boost.h>
 #include <linux/devfreq_boost.h>
 
@@ -2431,11 +2432,12 @@ retry_find_task:
 
 	ret = cgroup_attach_task(cgrp, tsk, threadgroup);
 
-	/* Boost CPU to the max for 500 ms when launcher becomes a top app */
-	if (!memcmp(tsk->comm, "s.nexuslauncher", sizeof("s.nexuslauncher")) &&
-		!memcmp(cgrp->kn->name, "top-app", sizeof("top-app")) && !ret) {
-		cpu_input_boost_kick_max(1000);
-		devfreq_boost_kick_max(DEVFREQ_MSM_CPUBW, 1000);
+	/* This covers boosting for app launches and app transitions */
+	if (!ret && !threadgroup &&
+		!memcmp(of->kn->parent->name, "top-app", sizeof("top-app")) &&
+		is_zygote_pid(tsk->parent->pid)) {
+		cpu_input_boost_kick_max(500);
+		devfreq_boost_kick_max(DEVFREQ_MSM_CPUBW, 500);
 	}
 
 	threadgroup_unlock(tsk);
