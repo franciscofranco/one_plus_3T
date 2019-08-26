@@ -99,3 +99,9 @@ all.config
 
 # fetched Android config fragments
 android/configs/android-*.cfg
+build.sh
+out/
+qcacld
+upload.sh
+version
+net/wireguard/
